@@ -555,7 +555,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &173779101
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1873,9 +1873,8 @@ PrefabInstance:
     - target: {fileID: 5779608150239002450, guid: 063cc896506b947c7b2c2ae3beb5868f,
         type: 3}
       propertyPath: m_text
-      value: 'Holo Edu application
-
-        Made by HCMUTE FIE IT Students'
+      value: "INTERACTIVE HOLOGRAPHIC DISPLAY \nFOR SPATIAL GEOMETRY EDUCATION\nMade
+        by HCMUTE FIE IT Students"
       objectReference: {fileID: 0}
     - target: {fileID: 5865099264268480235, guid: 063cc896506b947c7b2c2ae3beb5868f,
         type: 3}
@@ -2473,10 +2472,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetObject: {fileID: 722773782}
   mainCamera: {fileID: 1892810130}
-  trackablePositions: []
+  trackablePositions:
+  - {x: -0.05793476, y: 0.0059999973, z: 0.06519985}
+  - {x: -0.7158308, y: 0.46416855, z: 0.8120069}
+  - {x: -1.2440003, y: 0.5316448, z: 0.027953148}
   positionOffset: {x: -0.2, y: 0, z: 0}
-  minScaleFactor: 0.5
-  maxScaleFactor: 2
 --- !u!114 &722773786
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8555,6 +8555,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 173779101}
     m_Modifications:
+    - target: {fileID: 2148860079798956335, guid: d6df0df54b7dd4cd9ae7fa880a63e827,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2686945243201303682, guid: d6df0df54b7dd4cd9ae7fa880a63e827,
         type: 3}
       propertyPath: m_Pivot.x
