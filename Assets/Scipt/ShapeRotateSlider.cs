@@ -70,33 +70,29 @@ public class ShapeRotationSlider : MonoBehaviour
 
     private Vector3 CalculateBoundsCenter()
     {
-        Transform[] childTransforms = targetObject.GetComponentsInChildren<Transform>();
+        Bounds bounds = new Bounds(targetObject.transform.position, Vector3.zero);
+        Renderer[] renderers = targetObject.GetComponentsInChildren<Renderer>();
 
-        if (childTransforms.Length == 1)
+        // Ensure we have at least one renderer
+        if (renderers.Length == 0)
         {
-            Debug.LogWarning("Target object has no children. Defaulting to its position.");
+            Debug.LogWarning("No Renderer components found. Defaulting to target object's position.");
             return targetObject.transform.position;
         }
 
-        Vector3 totalPosition = Vector3.zero;
-        int childCount = 0;
-
-        foreach (Transform child in childTransforms)
+        // Encapsulate all renderers' bounds
+        foreach (Renderer renderer in renderers)
         {
-            if (child != targetObject.transform)
-            {
-                totalPosition += child.position;
-                childCount++;
-            }
+            bounds.Encapsulate(renderer.bounds);
         }
 
-        if (childCount == 0)
-        {
-            Debug.LogWarning("No valid child objects found. Defaulting to target object's position.");
-            return targetObject.transform.position;
-        }
+        Vector3 boundsCenter = bounds.center;
 
-        return totalPosition / childCount;
+        // Debugging: Draw a line to visualize the centroid in the scene
+        Debug.DrawLine(boundsCenter, boundsCenter + Vector3.up * 1f, Color.blue, 2f);
+        Debug.Log($"Bounds-based center: {boundsCenter}");
+
+        return boundsCenter; // Return the center of the encapsulated bounds
     }
 
     void OnDestroy()
