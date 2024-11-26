@@ -1581,7 +1581,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 436358032}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ba63293f961b46a1a5b648e4ba02cfb5, type: 3}
   m_Name: 
@@ -2703,7 +2703,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c556b82be1184446a8eb94e9afa1bff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  filePath: D:\SCHOLL_STUFFS\NCKH\HardShape.xml
+  filePath: D:\SCHOLL_STUFFS\NCKH\NoteCADFile.xml.xml
   go: {fileID: 722773782}
 --- !u!4 &722773784
 Transform:
@@ -2768,10 +2768,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 080f66a7f3e6cf04d9554674e0998c88, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sizeSlider: {fileID: 0}
-  objectScaler: {fileID: 0}
-  targetObject: {fileID: 0}
-  initialScale: {x: 0, y: 0, z: 0}
 --- !u!1 &729831742
 GameObject:
   m_ObjectHideFlags: 0
@@ -7015,9 +7011,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1480942054}
-  - component: {fileID: 1480942053}
-  - component: {fileID: 1480942052}
   - component: {fileID: 1480942055}
+  - component: {fileID: 1480942056}
   m_Layer: 0
   m_Name: SliderController
   m_TagString: Untagged
@@ -7025,34 +7020,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1480942052
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1480942051}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 82c7e3aed88234949abe839f42ead46c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sizeSlider: {fileID: 1738396955}
-  xmlLoader: {fileID: 722773783}
---- !u!114 &1480942053
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1480942051}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 82c7e3aed88234949abe839f42ead46c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sizeSlider: {fileID: 0}
-  xmlLoader: {fileID: 0}
 --- !u!4 &1480942054
 Transform:
   m_ObjectHideFlags: 0
@@ -7082,6 +7049,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rotationSlider: {fileID: 808597777}
   targetObject: {fileID: 722773782}
+  sensitivityMultiplier: 1
+--- !u!114 &1480942056
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1480942051}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82c7e3aed88234949abe839f42ead46c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sizeSlider: {fileID: 1738396955}
+  xmlLoader: {fileID: 722773783}
 --- !u!1 &1520419809
 GameObject:
   m_ObjectHideFlags: 0
@@ -7549,7 +7531,7 @@ MonoBehaviour:
   m_MinValue: 0.01
   m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 0.01
+  m_Value: 1
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []

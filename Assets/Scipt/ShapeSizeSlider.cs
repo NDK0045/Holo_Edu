@@ -8,61 +8,81 @@ public class ShapeSizeSlider : MonoBehaviour
     private GameObject targetObject;    // The shape being scaled
     private Vector3 initialScale;       // The shape's initial scale
     private bool isInitialized = false; // Flag to check if the object has been initialized
-    //private Rigidbody rb;
 
     void Start()
     {
         // Validate inputs
-        if (sizeSlider == null || xmlLoader == null)
+        if (sizeSlider == null)
         {
-            Debug.LogError("Slider or XMLLoader is not assigned.");
+            Debug.LogError("sizeSlider is not assigned in the Inspector.");
             return;
         }
+
+        if (xmlLoader == null)
+        {
+            Debug.LogError("XMLLoader is not assigned in the Inspector.");
+            return;
+        }
+
+        Debug.Log("Initialization successful!");
+
+        // Set the range of the slider to allow scaling up and down
+        sizeSlider.minValue = 0.01f; // Scale down to half the size
+        sizeSlider.maxValue = 0.2f;  // Scale up to twice the size
+        sizeSlider.value = 1f;     // Start at the original size
 
         // Add a listener to the slider
         sizeSlider.onValueChanged.AddListener(OnSliderValueChanged);
 
-        // Optionally set the slider's default value to "1" (original scale)
-        sizeSlider.value = 0.01f;
-
         // Wait for the object to load before initializing
         StartCoroutine(InitializeTargetObject());
-
-        //rb = targetObject.GetComponent<Rigidbody>();
     }
 
     private System.Collections.IEnumerator InitializeTargetObject()
     {
+        Debug.Log("Waiting for XMLLoader to load the target object...");
+
         // Wait for XMLLoader to finish loading
         while (xmlLoader.TargetObject == null)
         {
             yield return null; // Wait for the next frame
         }
 
+        Debug.Log("XMLLoader finished loading. Assigning target object...");
+
         // Once loaded, assign the target object and record its initial scale
         targetObject = xmlLoader.TargetObject;
+
         if (targetObject != null)
         {
-            // Use the current scale of the object as the initial scale
             initialScale = targetObject.transform.localScale;
             isInitialized = true;
+            Debug.Log($"Target object initialized. Initial scale: {initialScale}");
         }
         else
         {
-            Debug.LogError("Target object is not set in XMLLoader.");
+            Debug.LogError("XMLLoader.TargetObject is null after loading.");
         }
     }
 
     private void OnSliderValueChanged(float value)
     {
         // Scale the object only after initialization
-        if (isInitialized && targetObject != null)
+        if (!isInitialized)
         {
-            // Dynamically scale the object relative to its current initial scale
-            targetObject.transform.localScale = initialScale * value;
-
-            //targetObject.transform.RotateAround(targetObject.transform.TransformPoint(targetObject.GetComponent<BoxCollider>().center), Vector3.up, value);
+            Debug.LogWarning("Slider value changed, but the target object is not initialized yet.");
+            return;
         }
+
+        if (targetObject == null)
+        {
+            Debug.LogError("Target object is null. Cannot scale.");
+            return;
+        }
+
+        // Dynamically scale the object relative to its current initial scale
+        targetObject.transform.localScale = initialScale * value;
+        Debug.Log($"Scaled target object to {targetObject.transform.localScale}");
     }
 
     void OnDestroy()
