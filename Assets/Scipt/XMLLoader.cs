@@ -12,6 +12,14 @@ public class XMLLoader : MonoBehaviour
     public GameObject go;
     private PointManager pointManager;
 
+
+    //
+    public GameObject TargetObject
+    {
+        get { return go; }
+    }
+
+    //
     void Start()
     {
         pointManager = gameObject.AddComponent<PointManager>();

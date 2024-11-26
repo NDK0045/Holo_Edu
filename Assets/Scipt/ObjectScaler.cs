@@ -7,6 +7,8 @@ public class ObjectScaler : MonoBehaviour
     public Vector3[] trackablePositions;
     public Vector3 positionOffset = new Vector3(0f, 0f, 0f);
 
+    [HideInInspector] public Vector3 initialScale; // Expose the initial scale for the slider
+
     void Start()
     {
         if (targetObject == null || mainCamera == null)
@@ -22,6 +24,7 @@ public class ObjectScaler : MonoBehaviour
         }
 
         PositionAndScaleShape();
+        initialScale = targetObject.transform.localScale; // Store the initial scale
     }
 
     private void PositionAndScaleShape()
