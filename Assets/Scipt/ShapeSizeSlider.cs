@@ -28,7 +28,7 @@ public class ShapeSizeSlider : MonoBehaviour
 
         // Set the range of the slider to allow scaling up and down
         sizeSlider.minValue = 0.01f; // Scale down to half the size
-        sizeSlider.maxValue = 0.2f;  // Scale up to twice the size
+        sizeSlider.maxValue = 2f;  // Scale up to twice the size
         sizeSlider.value = 1f;     // Start at the original size
 
         // Add a listener to the slider
