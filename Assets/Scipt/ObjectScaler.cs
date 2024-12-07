@@ -2,78 +2,101 @@ using UnityEngine;
 
 public class ObjectScaler : MonoBehaviour
 {
-    // Max and min boundaries for x, y, z
-    public Vector3 minBoundary;
-    public Vector3 maxBoundary;
-
-    // The target object to scale and check bounds
     public GameObject targetObject;
+    public Camera mainCamera;
+    public Vector3[] trackablePositions;
+    public Vector3 positionOffset = new Vector3(0f, 0f, 0f);
 
-    void Update()
-    {
-        // Check for a key press to trigger scaling and boundary printing
-        
-            ScaleAndPrintBounds(targetObject);
-        
-    }
+    [HideInInspector] public Vector3 initialScale; // Expose the initial scale for the slider
 
-    // Method to calculate bounds, scale the object, and print farthest points
-    private void ScaleAndPrintBounds(GameObject obj)
+    void Start()
     {
-        if (obj == null)
+        if (targetObject == null || mainCamera == null)
         {
-            Debug.LogWarning("Target object is not assigned.");
+            Debug.LogError("Target object or main camera is not assigned.");
             return;
         }
 
-        // Get the object's combined bounds (including all children)
-        Bounds combinedBounds = CalculateCombinedBounds(obj);
-
-        // Calculate scaling factors for each axis based on boundaries
-        float scaleX = (maxBoundary.x - minBoundary.x) / (combinedBounds.max.x - combinedBounds.min.x);
-        float scaleY = (maxBoundary.y - minBoundary.y) / (combinedBounds.max.y - combinedBounds.min.y);
-        float scaleZ = (maxBoundary.z - minBoundary.z) / (combinedBounds.max.z - combinedBounds.min.z);
-
-        // Determine the smallest scale factor to maintain aspect ratio
-        float minScale = Mathf.Min(scaleX, Mathf.Min(scaleY, scaleZ));
-
-        // Apply scaling if the object exceeds the boundaries
-        if (minScale < 1f)  // Only scale down, not up
+        if (trackablePositions == null || trackablePositions.Length < 3)
         {
-            
-            obj.transform.localScale *= minScale;
+            Debug.LogError("Insufficient trackable positions provided.");
+            return;
         }
 
-        Debug.LogWarning(minScale);
-        // Print the farthest points in the x, y, and z directions
-        PrintFarthestPoints(combinedBounds);
+        PositionAndScaleShape();
+        initialScale = targetObject.transform.localScale; // Store the initial scale
     }
 
-    // Calculate combined bounds for the object and its children
+    private void PositionAndScaleShape()
+    {
+        Vector3[] relevantPositions = { trackablePositions[0], trackablePositions[2] };
+
+        Vector3 minBounds = Vector3.positiveInfinity;
+        Vector3 maxBounds = Vector3.negativeInfinity;
+
+        foreach (Vector3 pos in relevantPositions)
+        {
+            minBounds = Vector3.Min(minBounds, pos);
+            maxBounds = Vector3.Max(maxBounds, pos);
+        }
+
+        Vector3 center = (minBounds + maxBounds) / 2 + positionOffset;
+        Vector3 size = maxBounds - minBounds;
+
+        targetObject.transform.position = center;
+        ScaleShapeToFit(size);
+        AdjustCameraToView(center, size);
+    }
+
+    private void ScaleShapeToFit(Vector3 targetSize)
+    {
+        Bounds shapeBounds = CalculateCombinedBounds(targetObject);
+        if (shapeBounds.size == Vector3.zero)
+        {
+            Debug.LogWarning("Shape bounds are zero. Scaling skipped.");
+            return;
+        }
+
+        float scaleX = targetSize.x / shapeBounds.size.x;
+        float scaleY = targetSize.y / shapeBounds.size.y;
+        float scaleZ = targetSize.z / shapeBounds.size.z;
+        float uniformScale = Mathf.Min(scaleX, Mathf.Min(scaleY, scaleZ));
+
+        targetObject.transform.localScale = Vector3.one * uniformScale;
+    }
+
     private Bounds CalculateCombinedBounds(GameObject obj)
     {
-        // Initialize bounds
-        Bounds combinedBounds = new Bounds(obj.transform.position, Vector3.zero);
-
-        // Get all Renderer components in the object and its children
         Renderer[] renderers = obj.GetComponentsInChildren<Renderer>();
+        if (renderers.Length == 0) return new Bounds(Vector3.zero, Vector3.zero);
 
-        // Expand combined bounds to include each renderer's bounds
+        Bounds combinedBounds = renderers[0].bounds;
         foreach (Renderer renderer in renderers)
         {
             combinedBounds.Encapsulate(renderer.bounds);
         }
-
         return combinedBounds;
     }
 
-    // Print the farthest points in the x, y, and z directions
-    private void PrintFarthestPoints(Bounds bounds)
+    private void AdjustCameraToView(Vector3 center, Vector3 size)
     {
-        Vector3 minPoint = bounds.min;
-        Vector3 maxPoint = bounds.max;
+        float maxSize = Mathf.Max(size.x, size.y, size.z);
 
-        Debug.Log($"Farthest Min Point: X={minPoint.x}, Y={minPoint.y}, Z={minPoint.z}");
-        Debug.Log($"Farthest Max Point: X={maxPoint.x}, Y={maxPoint.y}, Z={maxPoint.z}");
+        // Ensure the camera is far enough to see the entire object
+        float distance = maxSize / (2 * Mathf.Tan(mainCamera.fieldOfView * 0.5f * Mathf.Deg2Rad));
+        distance *= 1.2f; // Add a buffer to ensure nothing is clipped
+
+        Vector3 cameraDirection = (mainCamera.transform.position - center).normalized;
+
+        // Calculate new camera position
+        Vector3 newCameraPosition = center + cameraDirection * distance;
+
+        // Move the camera and look at the center
+        mainCamera.transform.position = newCameraPosition;
+        mainCamera.transform.LookAt(center);
+
+        // Adjust the near and far clipping planes
+        mainCamera.nearClipPlane = 0.1f;
+        mainCamera.farClipPlane = Mathf.Max(distance * 2f, 1000f);
     }
 }
