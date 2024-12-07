@@ -4,6 +4,7 @@ using UnityEngine.UI;
 public class ShapeSizeSlider : MonoBehaviour
 {
     public Slider sizeSlider;           // Reference to the slider
+    public float alteredValue = 1;
     public XMLLoader xmlLoader;         // Reference to the XMLLoader
     private GameObject targetObject;    // The shape being scaled
     private Vector3 initialScale;       // The shape's initial scale
@@ -36,6 +37,17 @@ public class ShapeSizeSlider : MonoBehaviour
 
         // Wait for the object to load before initializing
         StartCoroutine(InitializeTargetObject());
+    }
+    public void trigger(GameObject go)
+    {
+        if (go == null)
+        {
+            Debug.LogError("Target object is null. Cannot rotate.");
+            return;
+        }
+
+        Debug.Log(this + " " + alteredValue);
+        go.transform.localScale = go.transform.localScale * alteredValue;
     }
 
     private System.Collections.IEnumerator InitializeTargetObject()
@@ -80,6 +92,7 @@ public class ShapeSizeSlider : MonoBehaviour
             return;
         }
 
+        alteredValue = value;
         // Dynamically scale the object relative to its current initial scale
         targetObject.transform.localScale = initialScale * value;
         Debug.Log($"Scaled target object to {targetObject.transform.localScale}");

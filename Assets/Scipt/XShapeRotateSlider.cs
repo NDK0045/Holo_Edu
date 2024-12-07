@@ -4,6 +4,8 @@ using UnityEngine.UI;
 public class XShapeRotationSlider : MonoBehaviour
 {
     public Slider rotationSlider;       // Reference to the slider
+    public float alteredValue = 0;
+
     public GameObject targetObject;    // The parent object that contains the children
     private float previousSliderValue;  // To track the last slider value
     private bool isInitialized = false; // Flag to check if the object has been initialized
@@ -38,6 +40,23 @@ public class XShapeRotationSlider : MonoBehaviour
         isInitialized = true;
     }
 
+    public void trigger(GameObject go)
+    {
+/*
+        if (go == null)
+        {
+            Debug.LogError("Target object is null. Cannot rotate.");
+            return;
+        }
+        Vector3 boundsCenter = CalculateBoundsCenter(go);
+        Debug.Log(this + " " + alteredValue);
+
+        // Rotate the object around the bounds center (Z-axis)
+        go.transform.RotateAround(boundsCenter, Vector3.right, alteredValue);
+*/
+    }
+
+    
     private void OnSliderValueChanged(float value)
     {
         if (!isInitialized)
@@ -60,23 +79,26 @@ public class XShapeRotationSlider : MonoBehaviour
         float deltaAngle = delta * 360f * sensitivityMultiplier;
 
         // Calculate the bounds center in world space
-        Vector3 boundsCenter = CalculateBoundsCenter();
+        Vector3 boundsCenter = CalculateBoundsCenter(targetObject);
 
         // Rotate the object around the bounds center (X-axis)
         targetObject.transform.RotateAround(boundsCenter, Vector3.right, deltaAngle);
+        
+        
+        alteredValue = deltaAngle;
 
         Debug.Log($"Rotated around {boundsCenter} by {deltaAngle} degrees on X-axis.");
     }
 
-    private Vector3 CalculateBoundsCenter()
+    private Vector3 CalculateBoundsCenter(GameObject ge)
     {
-        Bounds bounds = new Bounds(targetObject.transform.position, Vector3.zero);
-        Renderer[] renderers = targetObject.GetComponentsInChildren<Renderer>();
+        Bounds bounds = new Bounds(ge.transform.position, Vector3.zero);
+        Renderer[] renderers = ge.GetComponentsInChildren<Renderer>();
 
         if (renderers.Length == 0)
         {
             Debug.LogWarning("No Renderer components found. Defaulting to target object's position.");
-            return targetObject.transform.position;
+            return ge.transform.position;
         }
 
         foreach (Renderer renderer in renderers)
