@@ -3012,7 +3012,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8595bfd3345e554088e684192d06fd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  serverAddress: localhost
+  serverAddress: 192.168.123.42
   sendPort: 8000
   receivePort: 8001
   go: {fileID: 722773782}
