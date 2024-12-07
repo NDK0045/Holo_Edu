@@ -7926,7 +7926,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1520419809}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
@@ -10373,7 +10373,6 @@ MonoBehaviour:
     includeSkipButton: 0
   m_ObjectSpawner: {fileID: 436358033}
   m_GreetingPrompt: {fileID: 595971757}
-  m_OptionsButton: {fileID: 0}
   m_CreateButton: {fileID: 1059051467}
   m_MenuManager: {fileID: 2099970472}
 --- !u!114 &2099970472

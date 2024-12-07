@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "353680398778",
+    "project_id": "holoedu-firebase",
+    "storage_bucket": "holoedu-firebase.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:353680398778:android:d48608724069c7901de583",
+        "android_client_info": {
+          "package_name": "com.unity.holoedu.ar_mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_bkEXPNzfZdkzrcaLqONeeu-xCHS7zPg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
