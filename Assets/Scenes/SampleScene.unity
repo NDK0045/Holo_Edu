@@ -2719,6 +2719,7 @@ GameObject:
   - component: {fileID: 702413259}
   - component: {fileID: 702413258}
   - component: {fileID: 702413257}
+  - component: {fileID: 702413260}
   m_Layer: 0
   m_Name: AR Session
   m_TagString: Untagged
@@ -2768,6 +2769,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &702413260
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 702413256}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75631cb39b63f5e448d5c9a408d6d4ad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &717440024
 GameObject:
   m_ObjectHideFlags: 0
@@ -2945,7 +2958,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 722773782}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6c556b82be1184446a8eb94e9afa1bff, type: 3}
   m_Name: 
@@ -2994,7 +3007,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 722773782}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f8595bfd3345e554088e684192d06fd6, type: 3}
   m_Name: 
@@ -3003,6 +3016,8 @@ MonoBehaviour:
   sendPort: 8000
   receivePort: 8001
   go: {fileID: 722773782}
+  slider: {fileID: 1480942051}
+  pivot: {x: 0, y: 0, z: 0}
 --- !u!114 &722773787
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7785,6 +7800,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotationSlider: {fileID: 808597777}
+  alteredValue: 0
   targetObject: {fileID: 722773782}
   sensitivityMultiplier: 1
 --- !u!114 &1480942056
@@ -7800,6 +7816,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sizeSlider: {fileID: 1738396955}
+  alteredValue: 1
   xmlLoader: {fileID: 722773783}
 --- !u!114 &1480942057
 MonoBehaviour:
@@ -7814,6 +7831,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotationSlider: {fileID: 1227890582}
+  alteredValue: 0
   targetObject: {fileID: 722773782}
   sensitivityMultiplier: 1
 --- !u!114 &1480942058
@@ -7829,6 +7847,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotationSlider: {fileID: 1655845126}
+  alteredValue: 0
   targetObject: {fileID: 722773782}
   sensitivityMultiplier: 1
 --- !u!1 &1520419809
