@@ -8,7 +8,7 @@ using System.Xml;
 
 public class XMLLoader : MonoBehaviour
 {
-    public string filePath = "H:/DoAn/NoteCAD/HardShape.xml";
+    public string filePath = "D:\\SCHOLL_STUFFS\\NCKH\\NoteCADFile.xml.xml";
     public GameObject go;
     private PointManager pointManager;
 
