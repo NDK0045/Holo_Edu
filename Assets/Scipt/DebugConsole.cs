@@ -14,10 +14,7 @@ public class DebugConsole : MonoBehaviour
     [SerializeField] private Button clearButton; // Clear button
 
     private Queue<GameObject> logEntries = new Queue<GameObject>();
-    private void Start()
-    {
-        Debug.Log("Debug Console Initialized!");
-    }
+
     private void Awake()
     {
         // Assign the Clear button functionality
@@ -33,10 +30,18 @@ public class DebugConsole : MonoBehaviour
         UpdateConsoleVisibility();
     }
 
+    private void Start()
+    {
+        Debug.Log("Debug Console Initialized!");
+    }
+
     private void OnDestroy()
     {
         // Unsubscribe from Unity log messages
         Application.logMessageReceived -= HandleLog;
+
+        // Clean up any remaining log entries
+        ClearLogs();
     }
 
     private void Update()
@@ -65,6 +70,12 @@ public class DebugConsole : MonoBehaviour
 
     private void HandleLog(string logString, string stackTrace, LogType type)
     {
+        if (logTextPrefab == null || content == null)
+        {
+            Debug.LogWarning("Log Text Prefab or Content is missing.");
+            return;
+        }
+
         // Create a new TMP log entry
         GameObject logEntry = Instantiate(logTextPrefab, content.transform);
         TMP_Text logText = logEntry.GetComponent<TMP_Text>();
@@ -81,7 +92,10 @@ public class DebugConsole : MonoBehaviour
         if (logEntries.Count > maxLogHistory)
         {
             GameObject oldestLog = logEntries.Dequeue();
-            Destroy(oldestLog);
+            if (oldestLog != null)
+            {
+                Destroy(oldestLog);
+            }
         }
     }
 
@@ -90,7 +104,10 @@ public class DebugConsole : MonoBehaviour
         // Clear all log entries from the Content
         foreach (GameObject logEntry in logEntries)
         {
-            Destroy(logEntry);
+            if (logEntry != null)
+            {
+                Destroy(logEntry);
+            }
         }
         logEntries.Clear();
     }

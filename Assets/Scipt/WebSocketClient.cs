@@ -1,41 +1,58 @@
+using UnityEngine;
+using UnityEngine.InputSystem; // For Input System
+using UnityEngine.UI; // For InputField
+using TMPro; // For TMP_InputField
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using System.Reflection;
-using UnityEngine.InputSystem;
-using WebSocketSharp;
 using System.Xml.Linq;
-using System.IO;
+using System.Reflection;
+using WebSocketSharp;
 using System.Linq;
-using System.Xml;
 
 public class WebSocketClient : MonoBehaviour
 {
-    public string serverAddress = "192.168.123.42";
+    public string serverAddress = "192.168.123.42"; // Default server address
     public string sendPort = "8000";
     public string receivePort = "8001";
     public GameObject go;
     public GameObject slider;
+    public InputField serverAddressInputField; // For Unity UI InputField
+    public TMP_InputField serverAddressTMPInputField; // For TextMeshPro InputField
     public Vector3 pivot;
+
     private string tempMess;
     private WebSocket wsSend;
     private WebSocket wsReceive;
     private bool isConnecting = false;
     private PointManager pointManager;
-    
+
     private readonly Queue<string> messageQueue = new Queue<string>();
     private readonly object queueLock = new object();
     private Camera mainCamera;
+
     private void Start()
     {
+        // Initialize InputFields
+        if (serverAddressInputField != null)
+        {
+            serverAddressInputField.text = serverAddress;
+            serverAddressInputField.onEndEdit.AddListener(UpdateServerAddress);
+        }
+        if (serverAddressTMPInputField != null)
+        {
+            serverAddressTMPInputField.text = serverAddress;
+            serverAddressTMPInputField.onEndEdit.AddListener(UpdateServerAddress);
+        }
+
         StartCoroutine(AttemptConnection());
         pointManager = gameObject.AddComponent<PointManager>();
         StartCoroutine(ProcessMessageQueue());
         mainCamera = Camera.main;
     }
-    
+
     private void Update()
     {
+        // Handle mouse input for pivot setting
         if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
         {
             Ray ray = mainCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
@@ -46,6 +63,26 @@ public class WebSocketClient : MonoBehaviour
         }
     }
 
+    private void UpdateServerAddress(string newAddress)
+    {
+        Debug.Log($"Server address updated to: {newAddress}");
+        serverAddress = newAddress;
+        RestartConnection();
+    }
+
+    private void RestartConnection()
+    {
+        StopCoroutine(AttemptConnection());
+
+        // Close existing WebSocket connections
+        wsSend?.Close();
+        wsReceive?.Close();
+
+        // Reset connection process
+        isConnecting = false;
+        StartCoroutine(AttemptConnection());
+    }
+
     private void ClearAllObjects()
     {
         // Destroy all child objects of 'go'
@@ -53,8 +90,8 @@ public class WebSocketClient : MonoBehaviour
         {
             DestroyImmediate(go.transform.GetChild(0).gameObject);
         }
-        
-        // Clear the point manager's tracking collections by creating a new instance
+
+        // Reinitialize point manager
         DestroyImmediate(pointManager);
         pointManager = gameObject.AddComponent<PointManager>();
     }
@@ -77,7 +114,7 @@ public class WebSocketClient : MonoBehaviour
                 if (pivot != null)
                 {
                     ProcessXMLMessage(message);
-               		TriggerAll();
+                    TriggerAll();
                 }
                 else
                 {
@@ -86,6 +123,23 @@ public class WebSocketClient : MonoBehaviour
             }
 
             yield return null;
+        }
+    }
+
+    private void TriggerAll()
+    {
+        MonoBehaviour[] scripts = slider.GetComponents<MonoBehaviour>();
+
+        foreach (MonoBehaviour script in scripts)
+        {
+            if (script != null)
+            {
+                MethodInfo methodInfo = script.GetType().GetMethod("trigger");
+                if (methodInfo != null)
+                {
+                    methodInfo.Invoke(script, new object[] { go });
+                }
+            }
         }
     }
 
@@ -99,7 +153,6 @@ public class WebSocketClient : MonoBehaviour
             XElement detail = xmlDoc.Element("detail");
             if (detail != null)
             {
-                // Clear existing objects before creating new ones
                 ClearAllObjects();
 
                 foreach (XElement feature in detail.Elements("feature"))
@@ -117,11 +170,7 @@ public class WebSocketClient : MonoBehaviour
                                 float x = float.Parse(entity.Attribute("x")?.Value ?? "0");
                                 float y = float.Parse(entity.Attribute("y")?.Value ?? "0");
                                 float z = float.Parse(entity.Attribute("z")?.Value ?? "0");
-                                pointManager.AddPoint(entityId, 
-                                    x + pivot.x, 
-                                    y + pivot.y,
-                                    z + pivot.z,
-                                    go);
+                                pointManager.AddPoint(entityId, x + pivot.x, y + pivot.y, z + pivot.z, go);
                             }
                             else if (entityType == "LineEntity")
                             {
@@ -130,11 +179,7 @@ public class WebSocketClient : MonoBehaviour
                                     float px = float.Parse(pEntity.Attribute("x")?.Value ?? "0");
                                     float py = float.Parse(pEntity.Attribute("y")?.Value ?? "0");
                                     float pz = float.Parse(pEntity.Attribute("z")?.Value ?? "0");
-                                    pointManager.AddPoint(pEntity.Attribute("id")?.Value, 
-                                        px + pivot.x, 
-                                        py + pivot.y, 
-                                        pz + pivot.z,
-                                        go);
+                                    pointManager.AddPoint(pEntity.Attribute("id")?.Value, px + pivot.x, py + pivot.y, pz + pivot.z, go);
                                 }
 
                                 XElement startPointElement = entity.Elements("entity").ElementAt(0);
@@ -152,23 +197,14 @@ public class WebSocketClient : MonoBehaviour
                                     float endY = float.Parse(endPointElement.Attribute("y")?.Value ?? "0");
                                     float endZ = float.Parse(endPointElement.Attribute("z")?.Value ?? "0");
 
-                                    Point startPoint = pointManager.AddPoint(startId, 
-                                        startX + pivot.x, 
-                                        startY + pivot.y, 
-                                        startZ + pivot.z, 
-                                        go);
-                                    Point endPoint = pointManager.AddPoint(endId, 
-                                        endX + pivot.x, 
-                                        endY + pivot.y, 
-                                        endZ + pivot.z,
-                                        go);
+                                    Point startPoint = pointManager.AddPoint(startId, startX + pivot.x, startY + pivot.y, startZ + pivot.z, go);
+                                    Point endPoint = pointManager.AddPoint(endId, endX + pivot.x, endY + pivot.y, endZ + pivot.z, go);
                                     pointManager.AddLine(entityId, startPoint, endPoint, go);
                                 }
                             }
                         }
                     }
                 }
-
             }
         }
         catch (System.Exception e)
@@ -176,30 +212,6 @@ public class WebSocketClient : MonoBehaviour
             Debug.LogError("Failed to process XML: " + e.Message);
         }
     }
-    
-
-void TriggerAll()
-{
-    // Get all scripts attached to this GameObject
-    MonoBehaviour[] scripts = slider.GetComponents<MonoBehaviour>();
-
-    // Loop through each script
-    foreach (MonoBehaviour script in scripts)
-    {
-        if (script != null)
-        {
-            // Get the MethodInfo for the "trigger" method
-            MethodInfo methodInfo = script.GetType().GetMethod("trigger");
-
-            if (methodInfo != null)
-            {
-                // Invoke the method with "gameObject" as the parameter
-                methodInfo.Invoke(script, new object[] { go });
-            }
-        }
-    }
-}
-
 
     private IEnumerator AttemptConnection()
     {
@@ -256,19 +268,6 @@ void TriggerAll()
             }
 
             yield return new WaitForSeconds(3);
-        }
-    }
-
-    public void SendString(string message)
-    {
-        if (wsSend != null && wsSend.IsAlive)
-        {
-            wsSend.Send(message);
-            Debug.Log("Sent to server (send channel): " + message);
-        }
-        else
-        {
-            Debug.LogWarning("Send channel WebSocket is not connected.");
         }
     }
 
