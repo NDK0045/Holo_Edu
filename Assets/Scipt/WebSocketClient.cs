@@ -11,7 +11,7 @@ using System.Xml;
 
 public class WebSocketClient : MonoBehaviour
 {
-    public string serverAddress = "localhost";
+    public string serverAddress = "192.168.123.42";
     public string sendPort = "8000";
     public string receivePort = "8001";
     public GameObject go;
