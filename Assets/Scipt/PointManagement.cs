@@ -21,6 +21,8 @@ public class PointManager : MonoBehaviour
     {
         Vector3 position = new Vector3(x, y, z);
         
+		Debug.Log($"AddPoint {id} with {position}");
+
         if (!uniquePoints.ContainsKey(position))
         {
             Point point = new Point(id, x, y, z);

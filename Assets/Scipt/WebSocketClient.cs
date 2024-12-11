@@ -60,13 +60,13 @@ public class WebSocketClient : MonoBehaviour
 			msg = message.Trim();
 
 
-			//pointManager.Clear();
+			pointManager.Clear();
+			ClearAllObjects();
    			XMLHandler.ReadXML(message.Trim(), pointManager, go);
-			//ClearAllObjects();
 			//arMeshRenderer.ClearExistingMesh();
 			Mesh();
 			//TriggerAll();
-			//ResizeMesh();
+			ResizeMesh();
 
         }
     }

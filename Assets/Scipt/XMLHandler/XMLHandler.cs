@@ -5,6 +5,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.IO; 
 using System.Linq;  
+using System.Globalization;
 
 public class XMLHandler
 {
@@ -22,179 +23,132 @@ public class XMLHandler
     
     
     public static void ReadXML(string xmlContent, PointManager pointManager, GameObject go)
+{
+    try
     {
-        try
+        // Load and parse the XML content
+        var xmlDoc = XDocument.Parse(xmlContent);
+
+        XElement detail = xmlDoc.Element("detail");
+        if (detail == null)
         {
-            
-            //string xmlContent = File.ReadAllText(filePath, System.Text.Encoding.UTF8).Trim();
-			// Debug log to verify content (remove or comment out after testing)
-            // Debug.Log("XML Content:\n" + xmlContent);
-
-            var xml = new XmlDocument();
-            try
-            {
-                // Load the XML string
-                xml.LoadXml(xmlContent);
-
-                // Iterate through the <feature> nodes
-                foreach (XmlNode node in xml.DocumentElement.ChildNodes)
-                {
-                    if (node.Name == "feature" && node.Attributes != null)
-                    {
-                        string type = node.Attributes["type"]?.Value;
-                        Debug.Log($"Node: {node.OuterXml}");
-                        Debug.Log($"Type: {type}");
-                    }
-                }
-            }
-            catch (XmlException ex)
-            {
-                //Debug.LogError($"XML Parsing Error: {ex.Message}");
-            }
-            
-            // Parse the XML content
-            XDocument xmlDoc = XDocument.Parse(xmlContent);
-
-            XElement detail = xmlDoc.Element("detail");
-            if (detail != null)
-            {
-                // Parse each feature and its entities
-                foreach (XElement feature in detail.Elements("feature"))
-                {
-                    XElement entities = feature.Element("entities");
-                    if (entities != null)
-                    {
-                        // Iterate through each <entity> element
-                        foreach (XElement xe in entities.Elements("entity"))
-                        {
-                            
-                            
-                            Debug.LogError($"This type: {xe}");
-                            
-                            
-                            // Check if the "type" attribute is "PointEntity"
-                            if (xe.Attribute("type")?.Value == "PointEntity")
-                            {
-
-                            }
-
-                            
-                            
-                            else if (xe.Attribute("type")?.Value == "LineEntity")
-                            {
-
-                                foreach (XElement pEntity in xe.Elements("entity"))
-                                {
-                                    if (pEntity.Attribute("type")?.Value == "PointEntity")
-                                    { 
-
-                                        float px = float.Parse(pEntity.Attribute("x")?.Value ?? "0");
-                                        float py = float.Parse(pEntity.Attribute("y")?.Value ?? "0");
-                                        float pz = float.Parse(pEntity.Attribute("z")?.Value ?? "0");
-                                        pointManager.AddPoint(pEntity.Attribute("id")?.Value, px, py, pz, go);
-                                    }
-                                }
-                                XElement startPointElement = xe.Elements("entity").ElementAt(0);
-                                XElement endPointElement = xe.Elements("entity").ElementAt(1);
-
-                                Debug.Log((startPointElement==null) + " " + (endPointElement==null));
-                                if (startPointElement != null && endPointElement != null)
-                                {
-                                    string startId = startPointElement.Attribute("id")?.Value;
-                                    float startX = float.Parse(startPointElement.Attribute("x")?.Value ?? "0");
-                                    float startY = float.Parse(startPointElement.Attribute("y")?.Value ?? "0");
-                                    float startZ = float.Parse(startPointElement.Attribute("z")?.Value ?? "0");
-
-                                    string endId = endPointElement.Attribute("id")?.Value;
-                                    float endX = float.Parse(endPointElement.Attribute("x")?.Value ?? "0");
-                                    float endY = float.Parse(endPointElement.Attribute("y")?.Value ?? "0");
-                                    float endZ = float.Parse(endPointElement.Attribute("z")?.Value ?? "0");
-
-                                    // Add the two points to the manager and retrieve their instances
-                                    Point startPoint = pointManager.AddPoint(startId, startX, startY, startZ, go);
-                                    Point endPoint = pointManager.AddPoint(endId, endX, endY, endZ, go);
-
-                                    // Add the line between the two points
-                                    pointManager.AddLine(xe.Attribute("id")?.Value, startPoint, endPoint, go);
-                                }
-                            }
-                            
-                            
-                            else if (xe.Attribute("type")?.Value == "ArcEntity")
-                            {
-
-                            }
-                            else if (xe.Attribute("type")?.Value == "CircleEntity")
-                            {
-
-                            }
-                            else if (xe.Attribute("type")?.Value == "SplineEntity")
-                            {
-
-                            }
-                            else if (xe.Attribute("type")?.Value == "FunctionEntity")
-                            {
-
-                            }
-                        }
-
-                        /*foreach (XElement entity in entities.Elements("entity"))
-                        {
-                            string entityType = entity.Attribute("type")?.Value;
-                            string entityId = entity.Attribute("id")?.Value;
-
-                            if (entityType == "PointEntity")
-                            {
-                                float x = float.Parse(entity.Attribute("x")?.Value ?? "0");
-                                float y = float.Parse(entity.Attribute("y")?.Value ?? "0");
-                                float z = float.Parse(entity.Attribute("z")?.Value ?? "0");
-                                pointManager.AddPoint(entityId, x, y, z, go);
-                            }
-                            else if (entityType == "LineEntity")
-                            {
- 
-                                foreach (XElement pEntity in entity.Elements("entity"))
-                                {
-                                    float px = float.Parse(pEntity.Attribute("x")?.Value ?? "0");
-                                    float py = float.Parse(pEntity.Attribute("y")?.Value ?? "0");
-                                    float pz = float.Parse(pEntity.Attribute("z")?.Value ?? "0");
-                                    pointManager.AddPoint(pEntity.Attribute("id")?.Value, px, py, pz, go);
-                                }
-                                XElement startPointElement = entity.Elements("entity").ElementAt(0);
-                                XElement endPointElement = entity.Elements("entity").ElementAt(1);
-
-                                Debug.Log((startPointElement==null) + " " + (endPointElement==null));
-                                if (startPointElement != null && endPointElement != null)
-                                {
-                                    string startId = startPointElement.Attribute("id")?.Value;
-                                    float startX = float.Parse(startPointElement.Attribute("x")?.Value ?? "0");
-                                    float startY = float.Parse(startPointElement.Attribute("y")?.Value ?? "0");
-                                    float startZ = float.Parse(startPointElement.Attribute("z")?.Value ?? "0");
-
-                                    string endId = endPointElement.Attribute("id")?.Value;
-                                    float endX = float.Parse(endPointElement.Attribute("x")?.Value ?? "0");
-                                    float endY = float.Parse(endPointElement.Attribute("y")?.Value ?? "0");
-                                    float endZ = float.Parse(endPointElement.Attribute("z")?.Value ?? "0");
-
-                                    // Add the two points to the manager and retrieve their instances
-                                    Point startPoint = pointManager.AddPoint(startId, startX, startY, startZ, go);
-                                    Point endPoint = pointManager.AddPoint(endId, endX, endY, endZ, go);
-
-                                    // Add the line between the two points
-                                    pointManager.AddLine(entityId, startPoint, endPoint, go);
-                                }
-                            }
-                        }*/
-                    }
-                }
-            }
+            Debug.LogError("No <detail> element found in the XML content.");
+            return;
         }
-        catch (System.Exception e)
+
+        // Iterate through each <feature> element
+        foreach (XElement feature in detail.Elements("feature"))
         {
-            Debug.LogError("Failed to read XML: " + e.Message);
+            XElement entities = feature.Element("entities");
+            if (entities == null) continue;
+
+            // Process each <entity> element
+            foreach (XElement entity in entities.Elements("entity"))
+            {
+                string entityType = entity.Attribute("type")?.Value;
+                string entityId = entity.Attribute("id")?.Value;
+                Debug.Log($"Processing entity: Type={entityType}, ID={entityId}");
+
+                if (entityType == "PointEntity")
+                {
+                    ParseAndAddPoint(entity, pointManager, go);
+                }
+                else if (entityType == "LineEntity")
+                {
+                    ParseAndAddLine(entity, pointManager, go);
+                }
+                else if (entityType == "ArcEntity")
+                {
+                    // Handle ArcEntity parsing logic here
+                }
+                else if (entityType == "CircleEntity")
+                {
+                    // Handle CircleEntity parsing logic here
+                }
+                else if (entityType == "SplineEntity")
+                {
+                    // Handle SplineEntity parsing logic here
+                }
+                else if (entityType == "FunctionEntity")
+                {
+                    // Handle FunctionEntity parsing logic here
+                }
+                else
+                {
+                    Debug.LogWarning($"Unknown entity type: {entityType}");
+                }
+            }
         }
     }
-    
+    catch (XmlException ex)
+    {
+        Debug.LogError($"XML Parsing Error: {ex.Message}");
+    }
+    catch (System.Exception ex)
+    {
+        Debug.LogError($"Unexpected error while reading XML: {ex.Message}");
+    }
+}
+
+/// <summary>
+/// Parses a PointEntity and adds it to the PointManager.
+/// </summary>
+private static void ParseAndAddPoint(XElement entity, PointManager pointManager, GameObject go)
+{
+    try
+    {
+        float px = float.Parse(entity.Attribute("x")?.Value ?? "0", CultureInfo.InvariantCulture);
+        float py = float.Parse(entity.Attribute("y")?.Value ?? "0", CultureInfo.InvariantCulture);
+        float pz = float.Parse(entity.Attribute("z")?.Value ?? "0", CultureInfo.InvariantCulture);
+        string id = entity.Attribute("id")?.Value;
+
+        pointManager.AddPoint(id, px, py, pz, go);
+    }
+    catch (System.Exception ex)
+    {
+        Debug.LogError($"Error parsing PointEntity: {ex.Message}");
+    }
+}
+
+/// <summary>
+/// Parses a LineEntity and adds it to the PointManager.
+/// </summary>
+private static void ParseAndAddLine(XElement entity, PointManager pointManager, GameObject go)
+{
+    try
+    {
+        var points = entity.Elements("entity");
+        XElement startPointElement = points.ElementAtOrDefault(0);
+        XElement endPointElement = points.ElementAtOrDefault(1);
+
+        if (startPointElement == null || endPointElement == null)
+        {
+            Debug.LogError("LineEntity does not have exactly two PointEntity elements.");
+            return;
+        }
+
+        // Parse start and end points
+        string startId = startPointElement.Attribute("id")?.Value;
+        float startX = float.Parse(startPointElement.Attribute("x")?.Value ?? "0", CultureInfo.InvariantCulture);
+        float startY = float.Parse(startPointElement.Attribute("y")?.Value ?? "0", CultureInfo.InvariantCulture);
+        float startZ = float.Parse(startPointElement.Attribute("z")?.Value ?? "0", CultureInfo.InvariantCulture);
+
+        string endId = endPointElement.Attribute("id")?.Value;
+        float endX = float.Parse(endPointElement.Attribute("x")?.Value ?? "0", CultureInfo.InvariantCulture);
+        float endY = float.Parse(endPointElement.Attribute("y")?.Value ?? "0", CultureInfo.InvariantCulture);
+        float endZ = float.Parse(endPointElement.Attribute("z")?.Value ?? "0", CultureInfo.InvariantCulture);
+
+        // Add points and the line to the PointManager
+        Point startPoint = pointManager.AddPoint(startId, startX, startY, startZ, go);
+        Point endPoint = pointManager.AddPoint(endId, endX, endY, endZ, go);
+        pointManager.AddLine(entity.Attribute("id")?.Value, startPoint, endPoint, go);
+    }
+    catch (System.Exception ex)
+    {
+        Debug.LogError($"Error parsing LineEntity: {ex.Message}");
+    }
+}
+
     public static void ReadXML(PointManager pointManager, GameObject go)
     {
         try

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-16"?>
+<detail id="0" viewPos="-6.225517 -30.62068 -16.37778" viewRot="-0.4873904 -0.1325675 -0.2221421 0.8339841" viewSize="8.191999" activeFeature="2">
+	<feature type="SketchFeature" id="1" solveParent="False" alwaysHover="True">
+		<entities>
+			<entity type="PointEntity" id="1" x="0" y="0" z="0" />
+		</entities>
+	</feature>
+	<feature type="SketchFeature" id="2" solveParent="False">
+		<entities>
+			<entity type="LineEntity" id="1">
+				<entity type="PointEntity" id="2" x="-7.0811767578125" y="2.4453125" z="-1.41943359375" />
+				<entity type="PointEntity" id="3" x="-10.4457397460938" y="-4.72900390625" z="1.5791015625" />
+			</entity>
+			<entity type="LineEntity" id="4">
+				<entity type="PointEntity" id="5" x="-10.4457397460938" y="-4.72900390625" z="1.5791015625" />
+				<entity type="PointEntity" id="6" x="-2.47061157226563" y="-4.1004638671875" z="1.6201171875" />
+			</entity>
+			<entity type="LineEntity" id="8">
+				<entity type="PointEntity" id="9" x="-2.47061157226563" y="-4.1004638671875" z="1.6201171875" />
+				<entity type="PointEntity" id="A" x="-7.0811767578125" y="2.4453125" z="-1.41943359375" />
+			</entity>
+			<entity type="LineEntity" id="D">
+				<entity type="PointEntity" id="E" x="-11.1746826171875" y="-1.24609375" z="-0.1064453125" />
+				<entity type="PointEntity" id="F" x="-2.51824188232422" y="0.47021484375" z="-0.4873046875" />
+			</entity>
+			<entity type="LineEntity" id="10">
+				<entity type="PointEntity" id="11" x="-2.51824188232422" y="0.47021484375" z="-0.4873046875" />
+				<entity type="PointEntity" id="12" x="-5.96942138671875" y="-6.56005859375" z="2.89111328125" />
+			</entity>
+			<entity type="LineEntity" id="14">
+				<entity type="PointEntity" id="15" x="-5.96942138671875" y="-6.56005859375" z="2.89111328125" />
+				<entity type="PointEntity" id="16" x="-11.1746826171875" y="-1.24609375" z="-0.1064453125" />
+			</entity>
+		</entities>
+		<constraints>
+			<constraint type="PointsCoincident" id="7">
+				<link path="2/-1/3" />
+				<link path="2/-1/5" />
+			</constraint>
+			<constraint type="PointsCoincident" id="B">
+				<link path="2/-1/6" />
+				<link path="2/-1/9" />
+			</constraint>
+			<constraint type="PointsCoincident" id="C">
+				<link path="2/-1/A" />
+				<link path="2/-1/2" />
+			</constraint>
+			<constraint type="PointsCoincident" id="13">
+				<link path="2/-1/F" />
+				<link path="2/-1/11" />
+			</constraint>
+			<constraint type="PointsCoincident" id="17">
+				<link path="2/-1/12" />
+				<link path="2/-1/15" />
+			</constraint>
+			<constraint type="PointsCoincident" id="18">
+				<link path="2/-1/16" />
+				<link path="2/-1/E" />
+			</constraint>
+		</constraints>
+	</feature>
+</detail>
