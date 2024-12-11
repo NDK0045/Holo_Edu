@@ -5,10 +5,11 @@ public class ShapeSizeSlider : MonoBehaviour
 {
     public Slider sizeSlider;           // Reference to the slider
     public float alteredValue = 1;
-    public XMLLoader xmlLoader;         // Reference to the XMLLoader
-    private GameObject targetObject;    // The shape being scaled
+    //public XMLLoader xmlLoader;         // Reference to the XMLLoader
+    public GameObject targetObject;    // The shape being scaled
     private Vector3 initialScale;       // The shape's initial scale
     private bool isInitialized = false; // Flag to check if the object has been initialized
+	public BoxCollider box;
 
     void Start()
     {
@@ -19,16 +20,16 @@ public class ShapeSizeSlider : MonoBehaviour
             return;
         }
 
-        if (xmlLoader == null)
+        if (targetObject == null)
         {
-            Debug.LogError("XMLLoader is not assigned in the Inspector.");
+            Debug.LogError("targetObject is not assigned in the Inspector.");
             return;
         }
 
         Debug.Log("Initialization successful!");
 
         // Set the range of the slider to allow scaling up and down
-        sizeSlider.minValue = 0.01f; // Scale down to half the size
+        sizeSlider.minValue = 0.1f; // Scale down to half the size
         sizeSlider.maxValue = 2f;  // Scale up to twice the size
         sizeSlider.value = 1f;     // Start at the original size
 
@@ -47,33 +48,34 @@ public class ShapeSizeSlider : MonoBehaviour
         }
 
         Debug.Log(this + " " + alteredValue);
-        go.transform.localScale = go.transform.localScale * alteredValue;
+        //targetObject.transform.localScale = initialScale * alteredValue;
+        sizeSlider.value = 1f;     // Start at the original size
     }
 
     private System.Collections.IEnumerator InitializeTargetObject()
     {
-        Debug.Log("Waiting for XMLLoader to load the target object...");
+        Debug.Log("Waiting for targetObject to load the target object...");
 
-        // Wait for XMLLoader to finish loading
-        while (xmlLoader.TargetObject == null)
+        // Wait for targetObject to finish loading
+        while (targetObject == null)
         {
             yield return null; // Wait for the next frame
         }
 
-        Debug.Log("XMLLoader finished loading. Assigning target object...");
+        Debug.Log("targetObject finished loading. Assigning target object...");
 
         // Once loaded, assign the target object and record its initial scale
-        targetObject = xmlLoader.TargetObject;
+        //targetObject = xmlLoader.TargetObject;
 
         if (targetObject != null)
         {
-            initialScale = targetObject.transform.localScale;
+            initialScale = box.transform.localScale;
             isInitialized = true;
             Debug.Log($"Target object initialized. Initial scale: {initialScale}");
         }
         else
         {
-            Debug.LogError("XMLLoader.TargetObject is null after loading.");
+            Debug.LogError("targetObject.TargetObject is null after loading.");
         }
     }
 
@@ -94,8 +96,10 @@ public class ShapeSizeSlider : MonoBehaviour
 
         alteredValue = value;
         // Dynamically scale the object relative to its current initial scale
-        targetObject.transform.localScale = initialScale * value;
-        Debug.Log($"Scaled target object to {targetObject.transform.localScale}");
+        targetObject.transform.localScale = targetObject.transform.localScale * value;
+		sizeSlider.value = 1f; 
+        Debug.Log($"Scale value {value}");
+        //Debug.Log($"Scaled target object to {targetObject.transform.localScale}");
     }
 
     void OnDestroy()

@@ -1,132 +1,143 @@
-using UnityEngine;
-using UnityEngine.InputSystem; // For Input System
-using UnityEngine.UI; // For InputField
-using TMPro; // For TMP_InputField
+using System;
 using System.Collections;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
+using System.Threading.Tasks;
+using UnityEngine;
+using UnityEngine.UI; // Required for UI elements like buttons
+using WebSocketSharp; // Namespace for WebSocket
+using WebSocketSharp.Server; // Optional if using server-side WebSocketSharp
 using System.Xml.Linq;
+using System.IO; 
+using System.Linq; // Optional, but useful for LINQ queries if needed
+using System.Xml;
 using System.Reflection;
-using WebSocketSharp;
-using System.Linq;
+
 
 public class WebSocketClient : MonoBehaviour
 {
-    public string serverAddress = "192.168.123.42"; // Default server address
-    public string sendPort = "8000";
-    public string receivePort = "8001";
-    public GameObject go;
-    public GameObject slider;
-    public InputField serverAddressInputField; // For Unity UI InputField
-    public TMP_InputField serverAddressTMPInputField; // For TextMeshPro InputField
-    public Vector3 pivot;
+	public string msg = "";
+    public string serverAddress = "127.0.0.1";
+    public int sendPort = 8080;
+    public int receivePort = 8081;
 
-    private string tempMess;
+    public Button retryButton; // Assign this button in the Unity Inspector
+    public GameObject go;
+
     private WebSocket wsSend;
     private WebSocket wsReceive;
+    private readonly object queueLock = new object();
+    private readonly ConcurrentQueue<string> messageQueue = new ConcurrentQueue<string>();
     private bool isConnecting = false;
     private PointManager pointManager;
+    public GameObject slider;
 
-    private readonly Queue<string> messageQueue = new Queue<string>();
-    private readonly object queueLock = new object();
-    private Camera mainCamera;
+    public BoxCollider targetBoxCollider;
+    public ARMeshRenderer arMeshRenderer;
 
-    private void Start()
+    void Start()
     {
-        // Initialize InputFields
-        if (serverAddressInputField != null)
+		pointManager = gameObject.AddComponent<PointManager>();
+        if (retryButton != null)
         {
-            serverAddressInputField.text = serverAddress;
-            serverAddressInputField.onEndEdit.AddListener(UpdateServerAddress);
-        }
-        if (serverAddressTMPInputField != null)
-        {
-            serverAddressTMPInputField.text = serverAddress;
-            serverAddressTMPInputField.onEndEdit.AddListener(UpdateServerAddress);
+            // Disable the retry button initially
+            retryButton.interactable = false;
+
+            // Assign the retry method to the button's onClick event
+            retryButton.onClick.AddListener(() => StartCoroutine(AttemptConnection()));
         }
 
-        StartCoroutine(AttemptConnection());
-        pointManager = gameObject.AddComponent<PointManager>();
-        StartCoroutine(ProcessMessageQueue());
-        mainCamera = Camera.main;
-    }
-
-    private void Update()
-    {
-        // Handle mouse input for pivot setting
-        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
-        {
-            Ray ray = mainCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
-            if (Physics.Raycast(ray, out RaycastHit hit))
-            {
-                pivot = hit.point;
-            }
-        }
-    }
-
-    private void UpdateServerAddress(string newAddress)
-    {
-        Debug.Log($"Server address updated to: {newAddress}");
-        serverAddress = newAddress;
-        RestartConnection();
-    }
-
-    private void RestartConnection()
-    {
-        StopCoroutine(AttemptConnection());
-
-        // Close existing WebSocket connections
-        wsSend?.Close();
-        wsReceive?.Close();
-
-        // Reset connection process
-        isConnecting = false;
+        // Start the initial connection attempt
         StartCoroutine(AttemptConnection());
     }
 
-    private void ClearAllObjects()
+    void Update()
     {
-        // Destroy all child objects of 'go'
-        while (go.transform.childCount > 0)
+        // Process incoming messages in the Unity main thread
+        while (messageQueue.TryDequeue(out string message))
         {
-            DestroyImmediate(go.transform.GetChild(0).gameObject);
-        }
+            Debug.Log($"Processing message: {message}");
+            // Handle the message as needed
+			msg = message.Trim();
 
-        // Reinitialize point manager
-        DestroyImmediate(pointManager);
-        pointManager = gameObject.AddComponent<PointManager>();
-    }
 
-    private IEnumerator ProcessMessageQueue()
-    {
-        while (true)
-        {
-            string message = null;
-            lock (queueLock)
-            {
-                if (messageQueue.Count > 0)
-                {
-                    message = messageQueue.Dequeue();
-                }
-            }
+			pointManager.Clear();
+   			XMLHandler.ReadXML(message.Trim(), pointManager, go);
+			ClearAllObjects();
+			//arMeshRenderer.ClearExistingMesh();
+			Mesh();
+			TriggerAll();
+			ResizeMesh();
 
-            if (message != null)
-            {
-                if (pivot != null)
-                {
-                    ProcessXMLMessage(message);
-                    TriggerAll();
-                }
-                else
-                {
-                    tempMess = message;
-                }
-            }
-
-            yield return null;
         }
     }
 
-    private void TriggerAll()
+	void Mesh()
+    {
+        if (arMeshRenderer != null)
+        {
+            arMeshRenderer.InitializeMeshData(pointManager.GetPoints(), pointManager.GetLines());
+            arMeshRenderer.RespawnMesh(go.transform); // Use the parent transform for spawning
+        }
+        else
+        {
+            Debug.LogError("ARMeshRenderer is not assigned!");
+        }
+    }
+
+public void ResizeMesh()
+{
+    if (go == null || targetBoxCollider == null)
+    {
+        Debug.LogError("Parent object or Target BoxCollider is not assigned.");
+        return;
+    }
+
+    Renderer[] renderers = go.GetComponentsInChildren<Renderer>();
+    if (renderers.Length == 0)
+    {
+        Debug.LogError("No renderers found in the parent or its children.");
+        return;
+    }
+
+    Bounds combinedBounds = renderers[0].bounds;
+    foreach (var renderer in renderers)
+    {
+        combinedBounds.Encapsulate(renderer.bounds);
+    }
+
+    Bounds targetBounds = targetBoxCollider.bounds;
+
+    Vector3 combinedSize = combinedBounds.size;
+    Vector3 targetSize = targetBounds.size;
+
+    float scaleX = targetSize.x / combinedSize.x;
+    float scaleY = targetSize.y / combinedSize.y;
+    float scaleZ = targetSize.z / combinedSize.z;
+
+    float uniformScale = Mathf.Min(scaleX, scaleY, scaleZ);
+
+    go.transform.localScale *= uniformScale;
+    go.transform.position = targetBoxCollider.bounds.center;
+}
+
+	private void ClearAllObjects()
+    {
+		if (go.transform.childCount > 0)
+    	{
+        	// Loop through each child of the current GameObject
+        	foreach (Transform child in go.transform)
+        	{
+            	Debug.Log("[CLEANER] Destroying child: " + child.gameObject.name);
+            	Destroy(child.gameObject); // Destroy the child GameObject
+        	}
+    	}
+    	else
+  	  	{
+        	Debug.Log("[CLEANER] No child objects to clear.");
+    	}
+    }
+
+	private void TriggerAll()
     {
         MonoBehaviour[] scripts = slider.GetComponents<MonoBehaviour>();
 
@@ -143,138 +154,90 @@ public class WebSocketClient : MonoBehaviour
         }
     }
 
-    private void ProcessXMLMessage(string data)
-    {
-        try
-        {
-            string xmlContent = data.Trim();
-            XDocument xmlDoc = XDocument.Parse(xmlContent);
 
-            XElement detail = xmlDoc.Element("detail");
-            if (detail != null)
-            {
-                ClearAllObjects();
+    
 
-                foreach (XElement feature in detail.Elements("feature"))
-                {
-                    XElement entities = feature.Element("entities");
-                    if (entities != null)
-                    {
-                        foreach (XElement entity in entities.Elements("entity"))
-                        {
-                            string entityType = entity.Attribute("type")?.Value;
-                            string entityId = entity.Attribute("id")?.Value;
-
-                            if (entityType == "PointEntity")
-                            {
-                                float x = float.Parse(entity.Attribute("x")?.Value ?? "0");
-                                float y = float.Parse(entity.Attribute("y")?.Value ?? "0");
-                                float z = float.Parse(entity.Attribute("z")?.Value ?? "0");
-                                pointManager.AddPoint(entityId, x + pivot.x, y + pivot.y, z + pivot.z, go);
-                            }
-                            else if (entityType == "LineEntity")
-                            {
-                                foreach (XElement pEntity in entity.Elements("entity"))
-                                {
-                                    float px = float.Parse(pEntity.Attribute("x")?.Value ?? "0");
-                                    float py = float.Parse(pEntity.Attribute("y")?.Value ?? "0");
-                                    float pz = float.Parse(pEntity.Attribute("z")?.Value ?? "0");
-                                    pointManager.AddPoint(pEntity.Attribute("id")?.Value, px + pivot.x, py + pivot.y, pz + pivot.z, go);
-                                }
-
-                                XElement startPointElement = entity.Elements("entity").ElementAt(0);
-                                XElement endPointElement = entity.Elements("entity").ElementAt(1);
-
-                                if (startPointElement != null && endPointElement != null)
-                                {
-                                    string startId = startPointElement.Attribute("id")?.Value;
-                                    float startX = float.Parse(startPointElement.Attribute("x")?.Value ?? "0");
-                                    float startY = float.Parse(startPointElement.Attribute("y")?.Value ?? "0");
-                                    float startZ = float.Parse(startPointElement.Attribute("z")?.Value ?? "0");
-
-                                    string endId = endPointElement.Attribute("id")?.Value;
-                                    float endX = float.Parse(endPointElement.Attribute("x")?.Value ?? "0");
-                                    float endY = float.Parse(endPointElement.Attribute("y")?.Value ?? "0");
-                                    float endZ = float.Parse(endPointElement.Attribute("z")?.Value ?? "0");
-
-                                    Point startPoint = pointManager.AddPoint(startId, startX + pivot.x, startY + pivot.y, startZ + pivot.z, go);
-                                    Point endPoint = pointManager.AddPoint(endId, endX + pivot.x, endY + pivot.y, endZ + pivot.z, go);
-                                    pointManager.AddLine(entityId, startPoint, endPoint, go);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        catch (System.Exception e)
-        {
-            Debug.LogError("Failed to process XML: " + e.Message);
-        }
-    }
 
     private IEnumerator AttemptConnection()
     {
-        while (true)
+        if (isConnecting) yield break;
+
+        isConnecting = true;
+        Debug.Log("Attempting to connect to WebSocket...");
+
+        retryButton.interactable = false; // Disable the button during connection attempts
+
+        yield return AttemptConnectionAsync();
+
+        if (wsSend != null && wsSend.IsAlive && wsReceive != null && wsReceive.IsAlive)
         {
-            if (!isConnecting)
+            Debug.Log("WebSocket Client successfully connected!");
+        }
+        else
+        {
+            Debug.LogWarning("WebSocket connection failed.");
+            retryButton.interactable = true; // Enable the button if connection fails
+        }
+
+        isConnecting = false;
+    }
+
+    private async Task AttemptConnectionAsync()
+    {
+        try
+        {
+            // Initialize WebSocket connections
+            wsSend = new WebSocket($"ws://{serverAddress}:{sendPort}/Send");
+            wsReceive = new WebSocket($"ws://{serverAddress}:{receivePort}/Receive");
+
+            // Setup event handlers
+            wsSend.OnMessage += (sender, e) =>
             {
-                isConnecting = true;
-
-                wsSend = new WebSocket($"ws://{serverAddress}:{sendPort}/Send");
-                wsReceive = new WebSocket($"ws://{serverAddress}:{receivePort}/Receive");
-
-                wsSend.OnMessage += (sender, e) =>
+                Debug.Log("[Send Channel] Message received: " + e.Data);
+                lock (queueLock)
                 {
-                    Debug.Log("[Send Channel] Received from server: " + e.Data);
-                    lock (queueLock)
-                    {
-                        messageQueue.Enqueue(e.Data);
-                    }
-                };
-
-                wsReceive.OnMessage += (sender, e) =>
-                {
-                    Debug.Log("[Receive Channel] Received from server: " + e.Data);
-                };
-
-                wsSend.OnError += (sender, e) =>
-                {
-                    Debug.LogError("[Send Channel] WebSocket Error: " + e.Message);
-                };
-                wsReceive.OnError += (sender, e) =>
-                {
-                    Debug.LogError("[Receive Channel] WebSocket Error: " + e.Message);
-                };
-
-                wsSend.ConnectAsync();
-                wsReceive.ConnectAsync();
-
-                yield return new WaitForSeconds(1);
-
-                if (wsSend.IsAlive && wsReceive.IsAlive)
-                {
-                    Debug.Log("WebSocket Client connected to Send and Receive channels.");
-                    break;
+                    messageQueue.Enqueue(e.Data);
                 }
-                else
-                {
-                    Debug.LogWarning("WebSocket Client failed to connect, retrying...");
-                    wsSend.Close();
-                    wsReceive.Close();
-                }
+            };
+            wsReceive.OnMessage += (sender, e) =>
+            {
+                Debug.Log("[Receive Channel] Message received: " + e.Data);
+            };
 
-                isConnecting = false;
-            }
+            wsSend.OnError += (sender, e) =>
+            {
+                Debug.LogError("[Send Channel] Error: " + e.Message);
+            };
+            wsReceive.OnError += (sender, e) =>
+            {
+                Debug.LogError("[Receive Channel] Error: " + e.Message);
+            };
 
-            yield return new WaitForSeconds(3);
+            // Connect asynchronously
+            await Task.Run(() =>
+            {
+                Debug.Log("Connecting to Send WebSocket...");
+                wsSend.Connect();
+
+                Debug.Log("Connecting to Receive WebSocket...");
+                wsReceive.Connect();
+            });
+
+            // Confirm connection state
+            Debug.Log($"Send WebSocket IsAlive: {wsSend.IsAlive}");
+            Debug.Log($"Receive WebSocket IsAlive: {wsReceive.IsAlive}");
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("WebSocket connection error: " + ex.Message);
         }
     }
 
-    private void OnDestroy()
+    private void OnApplicationQuit()
     {
+        // Ensure connections are closed properly
+        Debug.Log("Closing WebSocket connections...");
         wsSend?.Close();
         wsReceive?.Close();
-        Debug.Log("WebSocket Client disconnected.");
     }
 }

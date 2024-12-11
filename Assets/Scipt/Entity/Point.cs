@@ -19,6 +19,14 @@ public class Point
         GameObject.name = $"Point_{Id}";
         GameObject.transform.position = Position;
         GameObject.transform.localScale = Vector3.one * 0.2f;  // Adjust the size of the sphere
+        
+        Renderer renderer = GameObject.GetComponent<Renderer>();
+        Material glowMaterial = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+        glowMaterial.EnableKeyword("_EMISSION");
+        glowMaterial.SetColor("_BaseColor", Color.green);
+        glowMaterial.SetColor("_EmissionColor", Color.green * 2.0f); // Adjust intensity
+        renderer.material = glowMaterial;
+        
    		GameObject.transform.SetParent(parentObject.transform);
     }
 

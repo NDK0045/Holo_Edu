@@ -6,6 +6,15 @@ public class PointManager : MonoBehaviour
 {
     public Dictionary<Vector3, Point> uniquePoints = new Dictionary<Vector3, Point>();
     public List<Line> lines = new List<Line>();
+    
+    public Dictionary<Vector3, Point> GetPoints() { return uniquePoints; }
+    public List<Line> GetLines() { return lines; }
+
+    public void Clear()
+    {
+        uniquePoints.Clear();
+        lines.Clear();
+    }
 
     // Method to add a point if its position is unique
     public Point AddPoint(string id, float x, float y, float z, GameObject go)
@@ -16,7 +25,7 @@ public class PointManager : MonoBehaviour
         {
             Point point = new Point(id, x, y, z);
             uniquePoints[position] = point;
-            point.CreateGameObject(go);  // Create and deploy point GameObject in Unity
+            //point.CreateGameObject(go);  // Create and deploy point GameObject in Unity
             return point;
         }
         else
@@ -32,8 +41,7 @@ public class PointManager : MonoBehaviour
         {
             Line line = new Line(id, startPoint, endPoint);
             lines.Add(line);
-            line.CreateGameObject(go);  // Create and deploy line GameObject in Unity
-			
+            //line.CreateGameObject(go);  // Create and deploy line GameObject in Unity
         }
     }
 }
