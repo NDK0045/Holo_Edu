@@ -10,6 +10,8 @@ public class Point
     {
         Id = id;
         Position = new Vector3(x, y, z);
+
+		Debug.Log($"We have position at {Position}");
     }
 
     // Creates a GameObject for the point in Unity

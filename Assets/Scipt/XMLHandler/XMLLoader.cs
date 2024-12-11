@@ -39,7 +39,7 @@ public class XMLLoader : MonoBehaviour
         if (arMeshRenderer != null)
         {
             arMeshRenderer.InitializeMeshData(pointManager.GetPoints(), pointManager.GetLines());
-            arMeshRenderer.RespawnMesh(go.transform); // Use the parent transform for spawning
+            arMeshRenderer.RespawnMesh(go); // Use the parent transform for spawning
         }
         else
         {

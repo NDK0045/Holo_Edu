@@ -60,13 +60,13 @@ public class WebSocketClient : MonoBehaviour
 			msg = message.Trim();
 
 
-			pointManager.Clear();
+			//pointManager.Clear();
    			XMLHandler.ReadXML(message.Trim(), pointManager, go);
-			ClearAllObjects();
+			//ClearAllObjects();
 			//arMeshRenderer.ClearExistingMesh();
 			Mesh();
-			TriggerAll();
-			ResizeMesh();
+			//TriggerAll();
+			//ResizeMesh();
 
         }
     }
@@ -76,7 +76,7 @@ public class WebSocketClient : MonoBehaviour
         if (arMeshRenderer != null)
         {
             arMeshRenderer.InitializeMeshData(pointManager.GetPoints(), pointManager.GetLines());
-            arMeshRenderer.RespawnMesh(go.transform); // Use the parent transform for spawning
+            arMeshRenderer.RespawnMesh(go); // Use the parent transform for spawning
         }
         else
         {

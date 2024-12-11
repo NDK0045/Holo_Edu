@@ -27,13 +27,13 @@ public class Line
         lineRenderer.SetPosition(0, StartPoint.Position);
         lineRenderer.SetPosition(1, EndPoint.Position);
 
-        lineRenderer.startWidth = 0.01f;
-        lineRenderer.endWidth = 0.01f;
+        lineRenderer.startWidth = 0.08f;
+        lineRenderer.endWidth = 0.08f;
             // Assign glow material
         Material glowMaterial = new Material(Shader.Find("Universal Render Pipeline/Lit"));
         glowMaterial.EnableKeyword("_EMISSION");
-        glowMaterial.SetColor("_BaseColor", Color.cyan);
-        glowMaterial.SetColor("_EmissionColor", Color.cyan * 2.0f); // Adjust intensity
+        glowMaterial.SetColor("_BaseColor", Color.red);
+        glowMaterial.SetColor("_EmissionColor", Color.red * 2.0f); // Adjust intensity
         lineRenderer.material = glowMaterial;
 
    		GameObject.transform.SetParent(parentObject.transform);
