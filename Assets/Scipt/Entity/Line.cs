@@ -16,26 +16,32 @@ public class Line
 
     // Creates a GameObject with LineRenderer to display the line in Unity
     public void CreateGameObject(GameObject parentObject)
-    {
-        GameObject = new GameObject($"Line_{Id}");
-        LineRenderer lineRenderer = GameObject.AddComponent<LineRenderer>();
+{
+    // Create the GameObject for the line
+    GameObject = new GameObject($"Line_{Id}");
+    LineRenderer lineRenderer = GameObject.AddComponent<LineRenderer>();
 
-		LineRendererScript lineScript = GameObject.AddComponent<LineRendererScript>();
-        lineScript.SetPivotPoints(StartPoint.GameObject, EndPoint.GameObject);
+    // Attach the LineRendererScript and set the pivot points
+    LineRendererScript lineScript = GameObject.AddComponent<LineRendererScript>();
+    lineScript.SetPivotPoints(StartPoint.GameObject, EndPoint.GameObject);
 
-        lineRenderer.positionCount = 2;
-        lineRenderer.SetPosition(0, StartPoint.Position);
-        lineRenderer.SetPosition(1, EndPoint.Position);
+    // Set the line renderer's position count and positions
+    lineRenderer.positionCount = 2;
+    lineRenderer.SetPosition(0, StartPoint.Position + parentObject.transform.position);
+    lineRenderer.SetPosition(1, EndPoint.Position + parentObject.transform.position);
+ 
 
-        lineRenderer.startWidth = 0.08f;
-        lineRenderer.endWidth = 0.08f;
-            // Assign glow material
-        Material glowMaterial = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-        glowMaterial.EnableKeyword("_EMISSION");
-        glowMaterial.SetColor("_BaseColor", Color.red);
-        glowMaterial.SetColor("_EmissionColor", Color.red * 2.0f); // Adjust intensity
-        lineRenderer.material = glowMaterial;
+    // Create a glowing material for the line
+    Material glowingMaterial = new Material(Shader.Find("Unlit/Color"));
+    glowingMaterial.SetColor("_Color", Color.red);  // Set color to green (or any color you prefer)
+    glowingMaterial.EnableKeyword("_EMISSION");
+    glowingMaterial.SetColor("_EmissionColor", Color.red * 2.0f);  // Increase the intensity for a glowing effect
 
-   		GameObject.transform.SetParent(parentObject.transform);
-    }
+    // Apply the material to the line renderer
+    lineRenderer.material = glowingMaterial;
+
+    // Set the parent of the line's GameObject
+    GameObject.transform.SetParent(parentObject.transform);
+}
+
 }

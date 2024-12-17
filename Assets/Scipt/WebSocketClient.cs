@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq; // Optional, but useful for LINQ queries if needed
 using System.Xml;
 using System.Reflection;
+using TMPro;
 
 
 public class WebSocketClient : MonoBehaviour
@@ -21,6 +22,7 @@ public class WebSocketClient : MonoBehaviour
     public int receivePort = 8081;
 
     public Button retryButton; // Assign this button in the Unity Inspector
+	public TMP_InputField tmpInputField;
     public GameObject go;
 
     private WebSocket wsSend;
@@ -43,6 +45,8 @@ public class WebSocketClient : MonoBehaviour
             retryButton.interactable = false;
 
             // Assign the retry method to the button's onClick event
+
+			tmpInputField.text = serverAddress;
             retryButton.onClick.AddListener(() => StartCoroutine(AttemptConnection()));
         }
 
@@ -52,6 +56,7 @@ public class WebSocketClient : MonoBehaviour
 
     void Update()
     {
+			ResizeMesh(); 
         // Process incoming messages in the Unity main thread
         while (messageQueue.TryDequeue(out string message))
         {
@@ -66,7 +71,6 @@ public class WebSocketClient : MonoBehaviour
 			//arMeshRenderer.ClearExistingMesh();
 			Mesh();
 			//TriggerAll();
-			ResizeMesh();
 
         }
     }
@@ -88,14 +92,14 @@ public void ResizeMesh()
 {
     if (go == null || targetBoxCollider == null)
     {
-        Debug.LogError("Parent object or Target BoxCollider is not assigned.");
+        //Debug.LogError("Parent object or Target BoxCollider is not assigned.");
         return;
     }
 
     Renderer[] renderers = go.GetComponentsInChildren<Renderer>();
     if (renderers.Length == 0)
     {
-        Debug.LogError("No renderers found in the parent or its children.");
+        //Debug.LogError("No renderers found in the parent or its children.");
         return;
     }
 
@@ -163,7 +167,13 @@ public void ResizeMesh()
         if (isConnecting) yield break;
 
         isConnecting = true;
-        Debug.Log("Attempting to connect to WebSocket...");
+
+		if (tmpInputField != null)
+        {
+            serverAddress = tmpInputField.text;
+		}
+
+        Debug.Log($"Attempting to connect to WebSocket at {serverAddress}...");
 
         retryButton.interactable = false; // Disable the button during connection attempts
 
@@ -171,11 +181,11 @@ public void ResizeMesh()
 
         if (wsSend != null && wsSend.IsAlive && wsReceive != null && wsReceive.IsAlive)
         {
-            Debug.Log("WebSocket Client successfully connected!");
+            Debug.Log($"WebSocket Client successfully connected at {serverAddress}!");
         }
         else
         {
-            Debug.LogWarning("WebSocket connection failed.");
+            Debug.LogWarning($"WebSocket connection failed at {serverAddress}.");
             retryButton.interactable = true; // Enable the button if connection fails
         }
 

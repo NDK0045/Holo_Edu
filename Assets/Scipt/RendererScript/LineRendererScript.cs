@@ -17,8 +17,8 @@ public class LineRendererScript : MonoBehaviour
 
         // Initialize the line with 2 points
         lineRenderer.positionCount = 2;
-        lineRenderer.startWidth = 0.08f;
-        lineRenderer.endWidth = 0.08f;
+        lineRenderer.startWidth = 10f;
+        lineRenderer.endWidth = 10f;
     }
 
     // Update is called once per frame

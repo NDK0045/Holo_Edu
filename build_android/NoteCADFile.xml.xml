@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-16"?>
+<detail id="0" viewPos="139.6573 18.05262 75.01061" viewRot="0.4822249 0.4010055 -0.2858479 0.7245306" viewSize="39.06251" activeFeature="2">
+	<feature type="SketchFeature" id="1" solveParent="False" alwaysHover="True">
+		<entities>
+			<entity type="PointEntity" id="1" x="0" y="0" z="0" name="-" />
+		</entities>
+	</feature>
+	<feature type="SketchFeature" id="2" solveParent="False">
+		<entities>
+			<entity type="PointEntity" id="1" x="121.1298828125" y="58.4912109375" z="81.05126953125" name="-" />
+			<entity type="PointEntity" id="2" x="121.1298828125" y="58.4912109375" z="60.033935546875" name="-" />
+			<entity type="PointEntity" id="3" x="121.1298828125" y="37.473876953125" z="81.05126953125" name="-" />
+			<entity type="PointEntity" id="4" x="121.1298828125" y="37.473876953125" z="60.033935546875" name="-" />
+			<entity type="PointEntity" id="5" x="142.147216796875" y="58.4912109375" z="81.05126953125" name="-" />
+			<entity type="PointEntity" id="6" x="142.147216796875" y="58.4912109375" z="60.033935546875" name="-" />
+			<entity type="PointEntity" id="7" x="142.147216796875" y="37.473876953125" z="81.05126953125" name="-" />
+			<entity type="PointEntity" id="8" x="142.147216796875" y="37.473876953125" z="60.033935546875" name="-" />
+			<entity type="LineEntity" id="9">
+				<entity type="PointEntity" id="A" x="0" y="0" z="0" name="-" />
+				<entity type="PointEntity" id="B" x="0" y="0" z="0" name="-" />
+			</entity>
+			<entity type="LineEntity" id="C">
+				<entity type="PointEntity" id="D" x="0" y="0" z="0" name="-" />
+				<entity type="PointEntity" id="E" x="0" y="0" z="0" name="-" />
+			</entity>
+			<entity type="LineEntity" id="F">
+				<entity type="PointEntity" id="10" x="0" y="0" z="0" name="-" />
+				<entity type="PointEntity" id="11" x="0" y="0" z="0" name="-" />
+			</entity>
+			<entity type="LineEntity" id="12">
+				<entity type="PointEntity" id="13" x="0" y="0" z="0" name="-" />
+				<entity type="PointEntity" id="14" x="0" y="0" z="0" name="-" />
+			</entity>
+			<entity type="LineEntity" id="15">
+				<entity type="PointEntity" id="16" x="0" y="0" z="0" name="-" />
+				<entity type="PointEntity" id="17" x="0" y="0" z="0" name="-" />
+			</entity>
+			<entity type="LineEntity" id="18">
+				<entity type="PointEntity" id="19" x="0" y="0" z="0" name="-" />
+				<entity type="PointEntity" id="1A" x="0" y="0" z="0" name="-" />
+			</entity>
+			<entity type="LineEntity" id="1B">
+				<entity type="PointEntity" id="1C" x="0" y="0" z="0" name="-" />
+				<entity type="PointEntity" id="1D" x="0" y="0" z="0" name="-" />
+			</entity>
+			<entity type="LineEntity" id="1E">
+				<entity type="PointEntity" id="1F" x="0" y="0" z="0" name="-" />
+				<entity type="PointEntity" id="20" x="0" y="0" z="0" name="-" />
+			</entity>
+			<entity type="LineEntity" id="21">
+				<entity type="PointEntity" id="22" x="0" y="0" z="0" name="-" />
+				<entity type="PointEntity" id="23" x="0" y="0" z="0" name="-" />
+			</entity>
+			<entity type="LineEntity" id="24">
+				<entity type="PointEntity" id="25" x="0" y="0" z="0" name="-" />
+				<entity type="PointEntity" id="26" x="0" y="0" z="0" name="-" />
+			</entity>
+			<entity type="LineEntity" id="27">
+				<entity type="PointEntity" id="28" x="0" y="0" z="0" name="-" />
+				<entity type="PointEntity" id="29" x="0" y="0" z="0" name="-" />
+			</entity>
+			<entity type="LineEntity" id="2A">
+				<entity type="PointEntity" id="2B" x="0" y="0" z="0" name="-" />
+				<entity type="PointEntity" id="2C" x="0" y="0" z="0" name="-" />
+			</entity>
+		</entities>
+	</feature>
+</detail>

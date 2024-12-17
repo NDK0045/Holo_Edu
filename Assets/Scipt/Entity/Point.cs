@@ -10,8 +10,6 @@ public class Point
     {
         Id = id;
         Position = new Vector3(x, y, z);
-
-		Debug.Log($"We have position at {Position}");
     }
 
     // Creates a GameObject for the point in Unity
@@ -19,17 +17,19 @@ public class Point
     {
         GameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         GameObject.name = $"Point_{Id}";
-        GameObject.transform.position = Position;
+        GameObject.transform.position = Position + parentObject.transform.position;
         GameObject.transform.localScale = Vector3.one * 0.2f;  // Adjust the size of the sphere
-        
-        Renderer renderer = GameObject.GetComponent<Renderer>();
-        Material glowMaterial = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-        glowMaterial.EnableKeyword("_EMISSION");
-        glowMaterial.SetColor("_BaseColor", Color.green);
-        glowMaterial.SetColor("_EmissionColor", Color.green * 2.0f); // Adjust intensity
+
+		Renderer renderer = GameObject.GetComponent<Renderer>();
+        Material glowMaterial = new Material(Shader.Find("Unlit/Color"));
+    	glowMaterial.SetColor("_Color", Color.blue);  // Set color to green (or any color you prefer)
+    	glowMaterial.EnableKeyword("_EMISSION");
+    	glowMaterial.SetColor("_EmissionColor", Color.blue * 2.0f); // Adjust intensity
         renderer.material = glowMaterial;
-        
+
    		GameObject.transform.SetParent(parentObject.transform);
+
+
     }
 
     public override bool Equals(object obj)
